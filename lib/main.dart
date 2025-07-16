@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:task_manager/tasks_screen.dart';
+import 'splash_screen.dart';
+import 'tasks_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,19 +17,30 @@ void main() async {
   // Open the tasks box with proper type
   await Hive.openBox<Task>('tasks');
   
-  runApp(const MyApp());
+  runApp(const DoitlyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class DoitlyApp extends StatelessWidget {
+  const DoitlyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      title: 'Doitly - Task Manager',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blueGrey,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blueGrey,
+          foregroundColor: Colors.white,
+          elevation: 2,
+        ),
       ),
-      home: tasks_screen(title: 'Tasks',),
+      home: const splash_screen(),
     );
   }
 }

@@ -1,36 +1,32 @@
-# 🚀 Flutter ITI Summer - Project Collection
+# 🚀 Doitly - Flutter Task Manager
 
-A collection of Flutter projects developed during the ITI Summer training program.
-
-## 📱 Projects
-
-### 1. Task Manager App
 A modern, feature-rich task management application built with Flutter and Hive database.
 
-#### ✨ Features
+## 📱 About Doitly
+
+Doitly is your personal task management companion that helps you stay organized and productive. Built with Flutter for cross-platform compatibility and Hive for fast local storage.
+
+### ✨ Key Features
+
 - **📝 Task Management**: Create, edit, delete, and mark tasks as complete
 - **🎯 Priority System**: High, Medium, Low priority with color-coded icons
-- **🔍 Smart Filtering**: Filter tasks by priority levels
+- **🔍 Smart Filtering**: Filter tasks by priority levels  
 - **💾 Persistent Storage**: Tasks saved locally using Hive database
 - **🎨 Modern UI**: Clean, intuitive interface with smooth animations
+- **📱 Cross-platform**: Works on Android, iOS, and Web
 
-#### 🛠️ Technologies Used
+### 🛠️ Technologies Used
+
 - **Flutter**: Cross-platform mobile development
 - **Hive**: Fast, lightweight local database
-- **Material Design**: Modern UI components
+- **Material Design 3**: Modern UI components
 - **Dart**: Programming language
-
-### 2. WhatsApp UI Clone
-A Flutter implementation of WhatsApp's user interface.
-
-### 3. Session Projects
-Various Flutter exercises and learning projects from different sessions.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Flutter SDK installed
-- Dart SDK installed
+- Flutter SDK (latest stable version)
+- Dart SDK  
 - Android Studio or VS Code with Flutter extension
 
 ### Installation
@@ -40,9 +36,9 @@ Various Flutter exercises and learning projects from different sessions.
 git clone https://github.com/Basmaashoura/Flutter_ITI_Summer.git
 ```
 
-2. Navigate to the specific project directory:
+2. Navigate to the project directory:
 ```bash
-cd Flutter_ITI_Summer/task_manager
+cd Flutter_ITI_Summer
 ```
 
 3. Install dependencies:
@@ -50,9 +46,9 @@ cd Flutter_ITI_Summer/task_manager
 flutter pub get
 ```
 
-4. For Task Manager, generate Hive type adapters:
+4. Generate Hive type adapters:
 ```bash
-flutter pub run build_runner build
+dart run build_runner build
 ```
 
 5. Run the app:
@@ -60,42 +56,70 @@ flutter pub run build_runner build
 flutter run
 ```
 
-## 📁 Repository Structure
+## 📁 Project Structure
 
 ```
-Flutter_ITI_Summer/
-├── task_manager/          # Task Manager App with Hive
-├── whatsapp_ui1/          # WhatsApp UI Clone
-├── session1/              # Session 1 exercises
-├── session2/              # Session 2 exercises
-├── session3/              # Session 3 exercises
-├── task_tracker/          # Task Tracking project
-└── README.md              # This file
+lib/
+├── main.dart              # App entry point & Hive initialization
+├── home_screen.dart       # Home screen with navigation
+├── tasks_screen.dart      # Task management screen
+├── notes_screen.dart      # Notes screen
+└── tasks_screen.g.dart    # Generated Hive type adapters
 ```
 
-## 🎯 Key Learning Outcomes
+## 🎯 Features in Detail
 
-- **State Management**: StatefulWidget and StatelessWidget usage
-- **Database Integration**: Hive for local storage
-- **UI/UX Design**: Material Design components
-- **Navigation**: Multi-screen Flutter applications
-- **Code Organization**: Clean architecture and best practices
+### Priority Management
+- 🔴 **High Priority**: Red icon - Urgent tasks that need immediate attention
+- 🟠 **Medium Priority**: Orange icon - Important tasks with moderate urgency
+- 🟢 **Low Priority**: Green icon - Optional tasks that can be done later
+
+### Task Operations
+- **Create**: Add new tasks with title, description, and priority
+- **Edit**: Modify existing tasks inline
+- **Complete**: Mark tasks as done with visual feedback
+- **Delete**: Remove tasks with confirmation
+- **Filter**: View tasks by priority level
+
+### Data Persistence
+- **Local Storage**: Uses Hive for fast, reliable local database
+- **Offline First**: All data stored locally, no internet required
+- **Performance**: Optimized for quick read/write operations
+
+## 🎨 UI/UX Design
+
+- **Material Design 3**: Modern, consistent design language
+- **Responsive Layout**: Adapts to different screen sizes
+- **Smooth Animations**: Enhances user experience
+- **Intuitive Navigation**: Easy-to-use interface
 
 ## 👨‍💻 Development
 
-These projects were developed as part of the Flutter ITI Summer program, demonstrating:
-- Progressive learning from basic to advanced concepts
-- Real-world application development
-- Modern Flutter development practices
-- Integration with local databases
+This project was developed as part of the Flutter ITI Summer program, demonstrating:
+- Advanced Flutter development techniques
+- State management with StatefulWidget
+- Local database integration
+- Modern UI/UX principles
+- Code organization and best practices
 
 ## 🔮 Future Enhancements
 
-- [ ] Add more project examples
-- [ ] Include advanced state management (Provider, Bloc)
-- [ ] API integration examples
-- [ ] Testing implementations
-- [ ] Performance optimization examples
+- [ ] Task categories and labels
+- [ ] Due dates and reminders
+- [ ] Search functionality
+- [ ] Dark mode support
+- [ ] Export/Import tasks
+- [ ] Cloud synchronization
+- [ ] Task sharing
+- [ ] Analytics and insights
+
+## 📸 Screenshots
+
+*Screenshots will be added here to showcase the app's interface*
+
+## 🤝 Contributing
+
+This is a learning project, but suggestions and improvements are welcome!
 
 ## 📞 Contact
 

@@ -109,11 +109,11 @@ class _notes_screen extends State<notes_screen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Notes Page",
+          "Doitly - Notes",
           style: TextStyle(
-            fontSize: 40,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.blueGrey,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,

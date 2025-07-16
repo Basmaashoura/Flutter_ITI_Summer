@@ -363,11 +363,11 @@ class _tasks_screen extends State<tasks_screen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Tasks Page",
+          "Doitly - Tasks",
           style: TextStyle(
-            fontSize: 40,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.blueGrey,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
