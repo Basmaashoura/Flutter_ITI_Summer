@@ -1,8 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'services/search_service.dart';
+import 'services/filter_service.dart';
+import 'services/sort_service.dart';
+import 'widgets/filter_sort_dialog.dart';
+import 'widgets/search_widget.dart';
+
 part 'tasks_screen.g.dart';
 
 class tasks_screen extends StatefulWidget {
@@ -23,7 +28,7 @@ class Task extends HiveObject {
   bool isDone;
   @HiveField(3)
   int priority; // 1 = High, 2 = Medium, 3 = Low
-  
+
   Task({
     required this.name,
     required this.description,
@@ -38,21 +43,40 @@ class _tasks_screen extends State<tasks_screen> {
 
   final TextEditingController task_name = TextEditingController();
   final TextEditingController task_description = TextEditingController();
-  
+  final TextEditingController searchController = TextEditingController();
+
+  // variables
   // Filter variables
   int? selectedFilterPriority; // null means show all priorities
+
+  // Sort variables
+  late String selectedSort;
+  bool isAscending = true; // Sort order
+
+  // Search variables
+  String searchQuery = '';
+  bool isSearching = false;
 
   @override
   void initState() {
     super.initState();
+    selectedSort = 'priority'; // Initialize with default value
     _initHive();
   }
 
-  // Initialize Hive and load tasks
+  @override
+  void dispose() {
+    searchController.dispose();
+    task_name.dispose();
+    task_description.dispose();
+    super.dispose();
+  }
+
+  // Initialize Hive
   Future<void> _initHive() async {
-    // Get the already opened box
+    // already opened box
     taskBox = Hive.box<Task>('tasks');
-    
+
     // Load tasks from Hive
     setState(() {
       tasks = taskBox.values.toList();
@@ -83,7 +107,7 @@ class _tasks_screen extends State<tasks_screen> {
       tasks = taskBox.values.toList();
     });
   }
-  
+
   // Helper method to get priority icon and color
   Widget getPriorityIcon(int priority) {
     switch (priority) {
@@ -97,31 +121,67 @@ class _tasks_screen extends State<tasks_screen> {
         return Icon(Icons.priority_high_rounded, color: Colors.grey);
     }
   }
-  
+
   String getPriorityText(int priority) {
-    switch (priority) {
-      case 1:
-        return 'High';
-      case 2:
-        return 'Medium';
-      case 3:
-        return 'Low';
-      default:
-        return 'Medium';
-    }
+    return FilterService.getPriorityText(priority);
   }
 
-  // Filter tasks by priority
+  // Get filtered, searched, and sorted tasks using individual services
   List<Task> getFilteredTasks() {
-    if (selectedFilterPriority == null) {
-      return tasks; // Show all tasks
-    }
-    return tasks.where((task) => task.priority == selectedFilterPriority).toList();
+    List<Task> filteredTasks = FilterService.filterTasks(
+      tasks,
+      selectedFilterPriority,
+    );
+    List<Task> searchedTasks = SearchService.searchTasks(
+      filteredTasks,
+      searchQuery,
+    );
+    List<Task> sortedTasks = SortService.sortTasks(
+      searchedTasks,
+      selectedSort,
+      isAscending,
+    );
+
+    return sortedTasks;
+  }
+
+  // Show Filter & Sort dialog using FilterSortDialog widget
+  void _showFilterSortDialog() {
+    showModalBottomSheet(
+      clipBehavior: Clip.antiAlias,
+      isDismissible: false,
+      isScrollControlled: true,
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => FilterSortDialog(
+        selectedFilterPriority: selectedFilterPriority,
+        selectedSort: selectedSort,
+        isAscending: isAscending,
+        onFilterChanged: (value) {
+          setState(() {
+            selectedFilterPriority = value;
+          });
+        },
+        onSortChanged: (value) {
+          setState(() {
+            selectedSort = value;
+          });
+        },
+        onSortOrderChanged: (value) {
+          setState(() {
+            isAscending = value;
+          });
+        },
+      ),
+    );
   }
 
   void _addTaskDialog() {
     int selectedPriority = 2; // Default to Medium
-    
+
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -138,19 +198,46 @@ class _tasks_screen extends State<tasks_screen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey,
+                    color: const Color(0xFF2072FA),
                   ),
                 ),
                 TextFormField(
                   controller: task_name,
-                  decoration: InputDecoration(hintText: 'Enter task name'),
+                  decoration: InputDecoration(
+                    hintText: 'Enter task name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
+                  ),
                 ),
                 TextFormField(
                   controller: task_description,
-                  decoration: InputDecoration(hintText: 'Enter task description'),
+                  decoration: InputDecoration(
+                    hintText: 'Enter task description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
+                  ),
                 ),
                 DropdownButtonFormField<int>(
-                  decoration: InputDecoration(hintText: 'Select priority'),
+                  decoration: InputDecoration(
+                    hintText: 'Select priority',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
+                  ),
                   value: selectedPriority,
                   items: [
                     DropdownMenuItem<int>(
@@ -167,7 +254,10 @@ class _tasks_screen extends State<tasks_screen> {
                       value: 2,
                       child: Row(
                         children: [
-                          Icon(Icons.priority_high_rounded, color: Colors.orange),
+                          Icon(
+                            Icons.priority_high_rounded,
+                            color: Colors.orange,
+                          ),
                           SizedBox(width: 8),
                           Text('Medium'),
                         ],
@@ -177,7 +267,10 @@ class _tasks_screen extends State<tasks_screen> {
                       value: 3,
                       child: Row(
                         children: [
-                          Icon(Icons.priority_high_rounded, color: Colors.green),
+                          Icon(
+                            Icons.priority_high_rounded,
+                            color: Colors.green,
+                          ),
                           SizedBox(width: 8),
                           Text('Low'),
                         ],
@@ -195,7 +288,7 @@ class _tasks_screen extends State<tasks_screen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    MaterialButton(
+                    ElevatedButton(
                       onPressed: () {
                         if (task_name.text.isNotEmpty &&
                             task_description.text.isNotEmpty) {
@@ -211,22 +304,48 @@ class _tasks_screen extends State<tasks_screen> {
                           Navigator.pop(context);
                         }
                       },
-                      color: Colors.blueGrey,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2072FA),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: Text(
                         'Add Task',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                    MaterialButton(
+                    ElevatedButton(
                       onPressed: () {
                         task_name.clear();
                         task_description.clear();
                         Navigator.pop(context);
                       },
-                      color: Colors.blueGrey,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: Text(
                         'Cancel',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -263,12 +382,42 @@ class _tasks_screen extends State<tasks_screen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey,
+                    color: const Color(0xFF2072FA),
+                  ),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
                   ),
                 ),
-                TextField(controller: editDesc, style: TextStyle(fontSize: 18)),
+                TextField(
+                  controller: editDesc,
+                  style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
+                  ),
+                ),
                 DropdownButtonFormField<int>(
-                  decoration: InputDecoration(hintText: 'Change priority'),
+                  decoration: InputDecoration(
+                    hintText: 'Change priority',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                    ),
+                  ),
                   value: selectedPriority,
                   items: [
                     DropdownMenuItem<int>(
@@ -285,7 +434,10 @@ class _tasks_screen extends State<tasks_screen> {
                       value: 2,
                       child: Row(
                         children: [
-                          Icon(Icons.priority_high_rounded, color: Colors.orange),
+                          Icon(
+                            Icons.priority_high_rounded,
+                            color: Colors.orange,
+                          ),
                           SizedBox(width: 8),
                           Text('Medium'),
                         ],
@@ -295,7 +447,10 @@ class _tasks_screen extends State<tasks_screen> {
                       value: 3,
                       child: Row(
                         children: [
-                          Icon(Icons.priority_high_rounded, color: Colors.green),
+                          Icon(
+                            Icons.priority_high_rounded,
+                            color: Colors.green,
+                          ),
                           SizedBox(width: 8),
                           Text('Low'),
                         ],
@@ -322,7 +477,7 @@ class _tasks_screen extends State<tasks_screen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    MaterialButton(
+                    ElevatedButton(
                       onPressed: () {
                         task.name = editName.text;
                         task.description = editDesc.text;
@@ -330,17 +485,46 @@ class _tasks_screen extends State<tasks_screen> {
                         _updateTask(task); // Use Hive update method
                         Navigator.pop(context);
                       },
-                      color: Colors.blueGrey,
-                      child: Text('Save', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2072FA),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Save',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                    MaterialButton(
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      color: Colors.blueGrey,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: Text(
                         'Cancel',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -361,157 +545,365 @@ class _tasks_screen extends State<tasks_screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Doitly - Tasks",
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<int?>(
-            icon: Icon(Icons.filter_list),
-            onSelected: (value) {
+      appBar: SearchAppBar(
+        isSearching: isSearching,
+        searchController: searchController,
+        onSearchChanged: (query) {
+          setState(() {
+            searchQuery = query;
+          });
+        },
+        onSearchToggle: () {
+          setState(() {
+            if (isSearching) {
+              // Close search
+              isSearching = false;
+              searchQuery = '';
+              searchController.clear();
+            } else {
+              // Open search
+              isSearching = true;
+            }
+          });
+        },
+        onFilterPressed: _showFilterSortDialog,
+      ),
+      body: Column(
+        children: [
+          // Search widget
+          SearchWidget(
+            searchController: searchController,
+            searchQuery: searchQuery,
+            isSearching: isSearching,
+            onSearchChanged: (query) {
               setState(() {
-                selectedFilterPriority = value;
+                searchQuery = query;
               });
             },
-            itemBuilder: (context) => [
-              PopupMenuItem<int?>(
-                value: null,
-                child: Text('All Tasks'),
-              ),
-              PopupMenuItem<int?>(
-                value: 1,
-                child: Row(
-                  children: [
-                    Icon(Icons.priority_high_rounded, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('High Priority'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<int?>(
-                value: 2,
-                child: Row(
-                  children: [
-                    Icon(Icons.priority_high_rounded, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Medium Priority'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<int?>(
-                value: 3,
-                child: Row(
-                  children: [
-                    Icon(Icons.priority_high_rounded, color: Colors.green),
-                    SizedBox(width: 8),
-                    Text('Low Priority'),
-                  ],
-                ),
-              ),
-            ],
+            onSearchToggle: () {
+              setState(() {
+                if (isSearching) {
+                  isSearching = false;
+                  searchQuery = '';
+                  searchController.clear();
+                } else {
+                  isSearching = true;
+                }
+              });
+            },
           ),
-        ],
-      ),
-      body: tasks.isEmpty
-          ? Center(child: Text("No tasks yet. Tap + to add one."))
-          : Column(
-              children: [
-                // Filter display
-                if (selectedFilterPriority != null)
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(8),
-                    color: Colors.grey[200],
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Showing: '),
-                        getPriorityIcon(selectedFilterPriority!),
-                        SizedBox(width: 4),
-                        Text(getPriorityText(selectedFilterPriority!)),
-                        SizedBox(width: 8),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedFilterPriority = null;
-                            });
-                          },
-                          child: Text('Clear Filter'),
-                        ),
-                      ],
-                    ),
-                  ),
-                // Tasks list
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: getFilteredTasks().length,
-                    itemBuilder: (context, index) {
-                      final task = getFilteredTasks()[index];
-                      final originalIndex = tasks.indexOf(task); // Get original index for actions
-                      return ListTile(
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                task.name,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueGrey,
-                                  decoration: task.isDone
-                                      ? TextDecoration.lineThrough
-                                      : null,
+
+          // Filter pills section (hidden during search)
+          if (!isSearching)
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  // All/Completed toggle
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedFilterPriority = null;
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: selectedFilterPriority == null
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(25),
+                                  boxShadow: selectedFilterPriority == null
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'All',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: selectedFilterPriority == null
+                                          ? const Color(0xFF2072FA)
+                                          : Colors.grey[600],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task.description,
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ],
-                        ),
-                        leading: IconButton(
-                          icon: Icon(
-                            task.isDone
-                                ? Icons.check_box
-                                : Icons.check_box_outline_blank,
-                            color: Colors.blueGrey,
                           ),
-                          onPressed: () => _toggleTask(originalIndex),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  // Show completed tasks filter
+                                  selectedFilterPriority =
+                                      -1; // Use -1 for completed
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: selectedFilterPriority == -1
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(25),
+                                  boxShadow: selectedFilterPriority == -1
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Completed',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: selectedFilterPriority == -1
+                                          ? const Color(0xFF2072FA)
+                                          : Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // Tasks list
+          Expanded(
+            child: getFilteredTasks().isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          searchQuery.isNotEmpty
+                              ? Icons.search_off
+                              : Icons.task_alt,
+                          size: 80,
+                          color: Colors.grey[400],
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            getPriorityIcon(task.priority),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.black),
-                              onPressed: () => _deleteTask(originalIndex),
+                        SizedBox(height: 16),
+                        Text(
+                          searchQuery.isNotEmpty
+                              ? "No tasks found for '$searchQuery'"
+                              : tasks.isEmpty
+                              ? "No tasks yet. Tap + to add one."
+                              : "No tasks match your current filter.",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (searchQuery.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  searchQuery = '';
+                                  searchController.clear();
+                                });
+                              },
+                              child: Text('Clear Search'),
+                            ),
+                          ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.all(16),
+                    itemCount: getFilteredTasks().length,
+                    itemBuilder: (context, index) {
+                      final task = getFilteredTasks()[index];
+                      final originalIndex = tasks.indexOf(task);
+
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
-                        onTap: () {
-                          _taskDetailsDialog(task);
-                        },
+                        child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          leading: GestureDetector(
+                            onTap: () => _toggleTask(originalIndex),
+                            child: Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: task.isDone
+                                    ? const Color(0xFF2072FA)
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: task.isDone
+                                      ? const Color(0xFF2072FA)
+                                      : Colors.grey[400]!,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: task.isDone
+                                  ? Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 16,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          title: SearchService.buildHighlightedText(
+                            task.name,
+                            searchQuery,
+                            TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: task.isDone
+                                  ? Colors.grey[500]
+                                  : Colors.black,
+                              decoration: task.isDone
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                          subtitle: task.description.isNotEmpty
+                              ? SearchService.buildHighlightedText(
+                                  task.description,
+                                  searchQuery,
+                                  TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                )
+                              : null,
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Priority badge
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: task.priority == 1
+                                      ? Colors.red.withOpacity(0.1)
+                                      : task.priority == 2
+                                      ? Colors.orange.withOpacity(0.1)
+                                      : Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  getPriorityText(task.priority),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: task.priority == 1
+                                        ? Colors.red
+                                        : task.priority == 2
+                                        ? Colors.orange
+                                        : Colors.green,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              // More options
+                              PopupMenuButton<String>(
+                                icon: Icon(
+                                  Icons.more_vert,
+                                  color: Colors.grey[600],
+                                ),
+                                onSelected: (value) {
+                                  if (value == 'edit') {
+                                    _taskDetailsDialog(task);
+                                  } else if (value == 'delete') {
+                                    _deleteTask(originalIndex);
+                                  }
+                                },
+                                itemBuilder: (context) => [
+                                  PopupMenuItem<String>(
+                                    value: 'edit',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Edit'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete,
+                                          size: 16,
+                                          color: Colors.red,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          onTap: () => _taskDetailsDialog(task),
+                        ),
                       );
                     },
                   ),
-                ),
-              ],
-            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTaskDialog,
+        backgroundColor: const Color(0xFF2072FA),
+        foregroundColor: Colors.white,
         child: Icon(Icons.add),
       ),
     );

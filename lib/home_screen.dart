@@ -18,7 +18,8 @@ class home_screen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: const Color(0xFF2072FA),
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: Container(
@@ -27,8 +28,8 @@ class home_screen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.blueGrey.shade50,
-              Colors.blueGrey.shade100,
+              const Color(0xFF2072FA).withOpacity(0.1),
+              const Color(0xFF2072FA).withOpacity(0.05),
             ],
           ),
         ),
@@ -40,13 +41,13 @@ class home_screen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.blueGrey,
+                  color: const Color(0xFF2072FA),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blueGrey.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      color: const Color(0xFF2072FA).withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
@@ -64,7 +65,7 @@ class home_screen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
+                  color: Color(0xFF2072FA),
                 ),
               ),
               const SizedBox(height: 10),
@@ -83,12 +84,13 @@ class home_screen extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey,
+                    backgroundColor: const Color(0xFF2072FA),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                     elevation: 5,
+                    shadowColor: const Color(0xFF2072FA).withOpacity(0.3),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -120,12 +122,13 @@ class home_screen extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey.shade600,
+                    backgroundColor: const Color(0xFF2072FA).withOpacity(0.8),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                     elevation: 5,
+                    shadowColor: const Color(0xFF2072FA).withOpacity(0.3),
                   ),
                   onPressed: () {
                     Navigator.push(

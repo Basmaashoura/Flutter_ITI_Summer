@@ -31,28 +31,47 @@ class _notes_screen extends State<notes_screen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 20,
             children: [
               Text(
                 'Add New Note',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
+                  color: const Color(0xFF2072FA),
                 ),
               ),
               TextFormField(
                 controller: note_title,
-                decoration: InputDecoration(hintText: 'Enter note title'),
+                decoration: InputDecoration(
+                  hintText: 'Enter note title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                  ),
+                ),
               ),
               TextFormField(
                 controller: note_description,
-                decoration: InputDecoration(hintText: 'Enter note description'),
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Enter note description',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: const Color(0xFF2072FA)),
+                  ),
+                ),
               ),
-              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  MaterialButton(
+                  ElevatedButton(
                     onPressed: () {
                       if (note_title.text.isNotEmpty &&
                           note_description.text.isNotEmpty) {
@@ -62,18 +81,42 @@ class _notes_screen extends State<notes_screen> {
                             description: note_description.text,
                           ));
                         });
+                        note_title.clear();
+                        note_description.clear();
                         Navigator.of(context).pop();
                       }
                     },
-                    color: Colors.blueGrey,
-                    textColor: Colors.white,
-                    child: Text("Add Note"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2072FA),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Add Note",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                   ),
-                  MaterialButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    color: Colors.redAccent,
-                    textColor: Colors.white,
-                    child: Text("Cancel"),
+                  ElevatedButton(
+                    onPressed: () {
+                      note_title.clear();
+                      note_description.clear();
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
@@ -93,11 +136,35 @@ class _notes_screen extends State<notes_screen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(note.title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        content: Text(note.description, style: TextStyle(fontSize: 18)),
+        title: Text(
+          note.title,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF2072FA),
+          ),
+        ),
+        content: Text(
+          note.description,
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.grey[700],
+            height: 1.5,
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2072FA),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: Text("Close"),
           ),
         ],
@@ -117,42 +184,87 @@ class _notes_screen extends State<notes_screen> {
           ),
         ),
         centerTitle: true,
+        backgroundColor: const Color(0xFF2072FA),
+        foregroundColor: Colors.white,
       ),
       body: notes.isEmpty
-          ? Center(child: Text("No notes yet. Tap + to add one."))
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.note_add,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "No notes yet. Tap + to add one.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            )
           : ListView.builder(
+              padding: EdgeInsets.all(8),
               itemCount: notes.length,
               itemBuilder: (context, index) {
                 final note = notes[index];
-                return ListTile(
-                  title: Text(
-                    note.title,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      note.title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF2072FA),
+                      ),
                     ),
+                    subtitle: Text(
+                      note.description,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    leading: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2072FA).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.note,
+                        size: 24,
+                        color: const Color(0xFF2072FA),
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red[400]),
+                      onPressed: () => _deleteNote(index),
+                    ),
+                    onTap: () {
+                      _noteDetailsDialog(note);
+                    },
                   ),
-                  subtitle: Text(
-                    note.description,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  leading: IconButton(
-                    icon: Icon(Icons.note, size: 30, color: Colors.blueGrey),
-                    onPressed: () {},
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.black),
-                    onPressed: () => _deleteNote(index),
-                  ),
-                  onTap: () {
-                    _noteDetailsDialog(note);
-                  },
                 );
               },
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNoteDialog,
+        backgroundColor: const Color(0xFF2072FA),
+        foregroundColor: Colors.white,
         child: Icon(Icons.add),
       ),
     );

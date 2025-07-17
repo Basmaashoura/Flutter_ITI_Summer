@@ -1,4 +1,5 @@
 import 'package:doitly/custom_button.dart';
+import 'package:doitly/home_screen.dart';
 import 'package:doitly/login.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +144,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 if (currentPage == onboardingModels.length - 1) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const login_screen()),
+                    MaterialPageRoute(builder: (context) => const home_screen()),
                   );
                 } else {
                   setState(() {
