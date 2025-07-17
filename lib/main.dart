@@ -30,12 +30,12 @@ class DoitlyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blueGrey,
+          seedColor: const Color(0xFF2072FA),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blueGrey,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF2072FA),
           foregroundColor: Colors.white,
           elevation: 2,
         ),
