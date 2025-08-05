@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 1 Lab</title>
+</head>
+
+<body>
+    <h2>First Task</h2>
+    <h1>Example of font tag in HTML</h1>
+    <font>General text without any font tag attribute value.</font>
+    <br>
+    <font color="orange">Text having normal font size and font face. Only changing font color.</font>
+    <br>
+    <font face="courier">Text having different font face.</font>
+    <br>
+    <font size="5">Text with increased font size having default font type.</font>
+
+    <h2>Second Task</h2>
+    <pre>
+    #include<stdio.h>
+    #include<conio.h>
+    int exp(i$ base, int power)
+
+    {
+        if(power==0)
+        {           return 1;            }
+        else
+        {           power--;
+                    return base*exp(base,power);
+        }
+    }
+
+    main()
+    {
+        int x=2 , y=3 ;
+        clrscr();
+        printf("\n %d * %d = %d",x,y,exp(x,y));
+        getch(); return 0;
+    }
+    </pre>
+
+    <h2>Third Task</h2>
+    <ol>
+        <li>Fruits
+            <ol>
+                <li>Mango</li>
+                <li>Orange</li>
+            </ol>
+        </li>
+        <li>Vegetables
+            <ol>
+                <li>Cabbage</li>
+                <li>Capsicum
+                    <ol>
+                        <li>Green Capsicum</li>
+                        <li>Yellow Capsicum</li>
+                        <li>Red Capsicum</li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+    </ol>
+
+    <h2>Fourth Task</h2>
+    <div style="background-color: #faf2e4;">    
+    <h1 align="center">
+        <img src="blackgoose.png" alt="Black Goosse logo">
+        <br>
+        <font face="Serif">Black Goose Bistro</font>
+    </h1>
+    <hr>
+    <h2 style="color: #d1633c">The Restaurant</h2>
+    <p>The Black Goose Bistro offers casual lunch and dinner fare in a relaxed atmosphere. The menu changes regularly to
+        highlight the freshest local ingredients.</p>
+
+    <h2 style="color: #d1633c">Catering</h2>
+    <p>You have fun. We'll handle the cooking. Black Goose Catering can handle events from snacks for a meetup to
+        elegant corporate fundraisers.</p>
+
+    <h2 style="color: #d1633c">Location and Hours</h2>
+    <p>Seekonk, Massachusetts;
+        Monday through Thursday 11am to 9pm;
+        Friday and Saturday, 11am to midnight</p>
+    </div>
+
+</body>
+
+</html>
