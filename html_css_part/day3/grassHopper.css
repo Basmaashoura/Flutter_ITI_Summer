@@ -1,0 +1,121 @@
+:root {
+    --text-color: #002c43;
+}
+
+/* Start Global Rules */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .container {
+        max-width: 600px
+    }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+    .container {
+        width: 600px;
+    }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+    .container {
+        width: 768px;
+    }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+    .container {
+        width: 992px;
+    }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+    .container {
+        width: 1200px;
+    }
+}
+
+.container {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    /* background-color: #eee; */
+}
+
+/* End Global Rules */
+
+/* Start header */
+.header .container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    justify-items: center;
+    gap: 20px;
+    padding: 0;
+    grid-template-areas: "logo tabs signin";
+    align-items: baseline;
+}
+
+.header .logo {
+    grid-area: logo;
+    font-family: "Fascinate Inline";
+    font-size: 28px;
+    font-weight: 100;
+    justify-self: start;
+    color: #00324b;
+}
+
+.header .tabs {
+    grid-area: tabs;
+    justify-self: flex-start;
+}
+
+.header ul {
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.header ul li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.header .container .signin-btn {
+    grid-area: signin;
+    justify-self: end;
+    color: #888;
+    font-size: 18px;
+
+}
+
+.header ul li a {
+    color: #888;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+/* .header ul li a:hover {
+    color: var(red);
+} */
+
+/* End header */
